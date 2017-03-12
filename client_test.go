@@ -624,6 +624,8 @@ func TestDocumentPost(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(name)
+
 	db := client.Use(name)
 	// use database
 	doc := &DummyDocument{
@@ -641,10 +643,6 @@ func TestDocumentPost(t *testing.T) {
 	if !res.Ok {
 		t.Error("expected ok to be true but got false instead")
 	}
-	// remove database
-	if _, err := client.Delete(name); err != nil {
-		t.Fatal(err)
-	}
 }
 
 func TestDocumentHead(t *testing.T) {
@@ -656,6 +654,7 @@ func TestDocumentHead(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(name)
 	db := client.Use(name)
 	// create document
 	doc := &DummyDocument{
@@ -685,6 +684,7 @@ func TestDocumentGet(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(name)
 	db := client.Use(name)
 	// create document
 	doc := &DummyDocument{
@@ -719,6 +719,7 @@ func TestDocumentPut(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(name)
 	db := client.Use(name)
 	// create document
 	doc := &DummyDocument{
@@ -759,6 +760,7 @@ func TestDocumentDelete(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(name)
 	db := client.Use(name)
 	// create document
 	doc := &DummyDocument{
@@ -798,6 +800,7 @@ func TestDocumentPutAttachment(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(name)
 	db := client.Use(name)
 	doc := &DummyDocument{
 		Document: Document{
@@ -829,6 +832,7 @@ func TestUpdateDocumentWithAttachment(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(name)
 	db := client.Use(name)
 	doc := &DummyDocument{
 		Document: Document{
@@ -868,6 +872,7 @@ func TestDocumentBulkDocs(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(name)
 	db := client.Use(name)
 	// first dummy document
 	doc1 := &DummyDocument{
@@ -902,6 +907,7 @@ func TestAllDocs(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(name)
 	db := client.Use(name)
 	// first dummy document
 	doc1 := &DummyDocument{
@@ -1052,6 +1058,7 @@ func TestView(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(name)
 	db := client.Use(name)
 	// create database
 	design := &DesignDocument{
@@ -1308,10 +1315,6 @@ func TestView(t *testing.T) {
 		}
 	})
 
-	// remove database
-	if _, err := client.Delete(name); err != nil {
-		t.Error(err)
-	}
 }
 
 // mimeType()
@@ -1763,6 +1766,7 @@ func TestSeed(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(name)
 	db := client.Use(name)
 	docs, err := client.Parse(filepath.Join("example", "design"))
 	if err != nil {
