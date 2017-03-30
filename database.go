@@ -29,6 +29,7 @@ type DatabaseService interface {
 	GetSecurity() (*SecurityDocument, error)
 	PutSecurity(secDoc SecurityDocument) (*DatabaseResponse, error)
 	View(name string) ViewService
+	Changes() ChangesService
 	Seed([]DesignDocument) error
 }
 
@@ -225,6 +226,13 @@ func (db *Database) View(name string) ViewService {
 	return &View{
 		URL:    u,
 		Client: db.Client,
+	}
+}
+
+// Changes returns a ChangesService to access change from the db.
+func (db *Database) Changes() ChangesService {
+	return &Changes{
+		Database: db,
 	}
 }
 
