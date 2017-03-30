@@ -18,10 +18,10 @@ import (
 var client *Client
 
 const (
-	// The folllowing characters are valid in databse names: /_$()-+
+	// The following characters are valid in database names: /_$()-+
 	// However there is a known bug in couchdb with + (skipping + for testing)
 	// https://issues.apache.org/jira/browse/COUCHDB-1580
-	validSpecialCharacter = "/_$()-/"
+	validSpecialCharacter = "/_$()-"
 	invalidCharacters     = "."
 )
 
@@ -411,6 +411,7 @@ func TestReplication(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(name)
 	// add some documents to database
 	db := client.Use(name)
 	for _, a := range []string{"dog", "mouse", "cat"} {
@@ -435,11 +436,8 @@ func TestReplication(t *testing.T) {
 	if !r.Ok {
 		t.Error("expected ok to be true but got false instead")
 	}
-	// remove both databases
-	for _, d := range []string{name, name2} {
-		if _, err := client.Delete(d); err != nil {
-			t.Fatal(err)
-		}
+	if _, err := client.Delete(name2); err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -450,6 +448,12 @@ func TestReplicationFilter(t *testing.T) {
 	if _, err := client.Create(dbName); err != nil {
 		t.Error(err)
 	}
+	defer func() {
+		// remove both databases
+		for _, d := range []string{dbName, dbName2} {
+			client.Delete(d)
+		}
+	}()
 	// add some documents to database
 	db := client.Use(dbName)
 	docs := []animal{
@@ -516,12 +520,7 @@ func TestReplicationFilter(t *testing.T) {
 	if len(allDocs.Rows) != 2 {
 		t.Errorf("expected exactly two documents but got %d instead", len(allDocs.Rows))
 	}
-	// remove both databases
-	for _, d := range []string{dbName, dbName2} {
-		if _, err := client.Delete(d); err != nil {
-			t.Fatal(err)
-		}
-	}
+
 }
 
 // test continuous replication to test getting replication document
@@ -533,6 +532,12 @@ func TestReplicationContinuous(t *testing.T) {
 	if _, err := client.Create(dbName); err != nil {
 		t.Error(err)
 	}
+	defer func() {
+		// remove both databases
+		for _, d := range []string{dbName, dbName2} {
+			client.Delete(d)
+		}
+	}()
 	// create replication document inside _replicate database
 	req := ReplicationRequest{
 		Document: Document{
@@ -553,12 +558,7 @@ func TestReplicationContinuous(t *testing.T) {
 	if tasks[0].Type != "replication" {
 		t.Errorf("expected type replication but got %s instead", tasks[0].Type)
 	}
-	// remove both databases
-	for _, d := range []string{dbName, dbName2} {
-		if _, err := client.Delete(d); err != nil {
-			t.Fatal(err)
-		}
-	}
+
 }
 
 func TestRequest(t *testing.T) {
@@ -567,6 +567,7 @@ func TestRequest(t *testing.T) {
 	if _, err := client.Create(name); err != nil {
 		t.Fatal(err)
 	}
+	defer client.Delete(name)
 	// add some documents to database
 	db := client.Use(name)
 	animals := []string{"dog", "mouse", "cat"}
@@ -600,10 +601,6 @@ func TestRequest(t *testing.T) {
 	}
 	u := fmt.Sprintf("%s/%s", name, doc["_id"])
 	if _, err := client.Request(http.MethodPut, u, &b, "application/json"); err != nil {
-		t.Fatal(err)
-	}
-	// remove database
-	if _, err := client.Delete(name); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -946,6 +943,7 @@ func TestPurge(t *testing.T) {
 	if _, err := client.Create(dbName); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(dbName)
 	db := client.Use(dbName)
 	// create documents
 	doc := &DummyDocument{
@@ -976,10 +974,6 @@ func TestPurge(t *testing.T) {
 	if revisions[0] != postResponse.Rev {
 		t.Error("expected purged revision to be the same as posted document revision")
 	}
-	// remove database
-	if _, err := client.Delete(dbName); err != nil {
-		t.Error(err)
-	}
 }
 
 func TestSecurity(t *testing.T) {
@@ -988,6 +982,7 @@ func TestSecurity(t *testing.T) {
 	if _, err := client.Create(dbName); err != nil {
 		t.Error(err)
 	}
+	defer client.Delete(dbName)
 	db := client.Use(dbName)
 	// test putting security document first
 	secDoc := SecurityDocument{
@@ -1025,10 +1020,6 @@ func TestSecurity(t *testing.T) {
 	}
 	if doc.Members.Names[0] != "member1" {
 		t.Errorf("expected name member1 but got %s instead", doc.Members.Names[0])
-	}
-	// remove database
-	if _, err := client.Delete(dbName); err != nil {
-		t.Error(err)
 	}
 }
 
