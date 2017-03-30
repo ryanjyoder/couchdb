@@ -12,6 +12,7 @@ import (
 )
 
 // ChangesService is an interface for manages the _changes endpoint.
+//   http://docs.couchdb.org/en/2.0.0/api/database/changes.html
 type ChangesService interface {
 	Stream(params ChangesQueryParameters) (<-chan Change, error)
 	Poll(params ChangesQueryParameters) (*ChangesResponse, error)
@@ -55,7 +56,6 @@ type Rev struct {
 }
 
 // ChangesQueryParameters is struct to define url query parameters for the _changes endpoint.
-//   http://docs.couchdb.org/en/2.0.0/api/database/changes.html
 type ChangesQueryParameters struct {
 	DocIDs          []string `url:"doc_ids,omitempty"`
 	Conflicts       *bool    `url:"conflicts,omitempty"`
