@@ -49,6 +49,7 @@ func (a ArbitraryDoc) GetID() string {
 	}
 	return ""
 }
+
 func (a ArbitraryDoc) GetRev() string {
 	if revI, ok := a["_rev"]; ok {
 		if rev, ok := revI.(string); ok {
