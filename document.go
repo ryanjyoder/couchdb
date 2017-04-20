@@ -38,3 +38,22 @@ func (d *Document) GetID() string {
 func (d *Document) GetRev() string {
 	return d.Rev
 }
+
+type ArbitraryDoc map[string]interface{}
+
+func (a ArbitraryDoc) GetID() string {
+	if idI, ok := a["_id"]; ok {
+		if id, ok := idI.(string); ok {
+			return id
+		}
+	}
+	return ""
+}
+func (a ArbitraryDoc) GetRev() string {
+	if revI, ok := a["_rev"]; ok {
+		if rev, ok := revI.(string); ok {
+			return rev
+		}
+	}
+	return ""
+}
